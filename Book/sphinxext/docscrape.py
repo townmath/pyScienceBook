@@ -6,7 +6,7 @@ import inspect
 import textwrap
 import re
 import pydoc
-from StringIO import StringIO
+from io import StringIO
 from warnings import warn
 4
 class Reader(object):
@@ -183,7 +183,7 @@ class NumpyDocString(object):
 
         return params
 
-    
+
     _name_rgx = re.compile(r"^\s*(:(?P<role>\w+):`(?P<name>[a-zA-Z0-9_.-]+)`|"
                            r" (?P<name2>[a-zA-Z0-9_.-]+))\s*", re.X)
     def _parse_see_also(self, content):
@@ -216,7 +216,7 @@ class NumpyDocString(object):
 
         current_func = None
         rest = []
-        
+
         for line in content:
             if not line.strip(): continue
 
@@ -258,7 +258,7 @@ class NumpyDocString(object):
             if len(line) > 2:
                 out[line[1]] = strip_each_in(line[2].split(','))
         return out
-    
+
     def _parse_summary(self):
         """Grab signature (if given) and summary"""
         if self._is_at_section():
@@ -275,7 +275,7 @@ class NumpyDocString(object):
 
         if not self._is_at_section():
             self['Extended Summary'] = self._read_to_next_section()
-    
+
     def _parse(self):
         self._doc.reset()
         self._parse_summary()
@@ -413,10 +413,10 @@ class FunctionDoc(NumpyDocString):
             doc = inspect.getdoc(func) or ''
         try:
             NumpyDocString.__init__(self, doc)
-        except ValueError, e:
-            print '*'*78
-            print "ERROR: '%s' while parsing `%s`" % (e, self._f)
-            print '*'*78
+        except:# ValueError e:
+            print ('*'*78)
+            print ("ERROR: '%s' while parsing `%s`" % (e, self._f))
+            print ('*'*78)
             #print "Docstring follows:"
             #print doclines
             #print '='*78
@@ -429,7 +429,7 @@ class FunctionDoc(NumpyDocString):
                 argspec = inspect.formatargspec(*argspec)
                 argspec = argspec.replace('*','\*')
                 signature = '%s%s' % (func_name, argspec)
-            except TypeError, e:
+            except:#TypeError, e:
                 signature = '%s()' % func_name
             self['Signature'] = signature
 
@@ -440,7 +440,7 @@ class FunctionDoc(NumpyDocString):
         else:
             func = self._f
         return func, func_name
-            
+
     def __str__(self):
         out = ''
 
@@ -452,7 +452,7 @@ class FunctionDoc(NumpyDocString):
 
         if self._role:
             if not roles.has_key(self._role):
-                print "Warning: invalid role %s" % self._role
+                print ("Warning: invalid role %s" % self._role)
             out += '.. %s:: %s\n    \n\n' % (roles.get(self._role,''),
                                              func_name)
 
@@ -493,5 +493,3 @@ class ClassDoc(NumpyDocString):
         #    out += '.. index::\n   single: %s; %s\n\n' % (self._name, m)
 
         return out
-
-

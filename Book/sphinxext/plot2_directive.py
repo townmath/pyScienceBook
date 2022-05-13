@@ -16,7 +16,8 @@ The set of file formats to generate can be specified with the
 plot_formats configuration variable.
 """
 
-import sys, os, glob, shutil, hashlib, imp, warnings, cStringIO
+import sys, os, glob, shutil, hashlib, imp, warnings
+from io import BytesIO as cStringIO #??
 import re
 try:
     from hashlib import md5
@@ -48,7 +49,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as image
 from matplotlib import _pylab_helpers
 
-import matplotlib.sphinxext.only_directives
+#import matplotlib.sphinxext.only_directives #?? replacement?
 
 if hasattr(os.path, 'relpath'):
     relpath = os.path.relpath
@@ -60,22 +61,22 @@ else:
         """
 
         if not os.path.exists(target):
-            raise OSError, 'Target does not exist: '+target
+            raise OSError('Target does not exist: '+target)
 
         if not os.path.isdir(base):
-            raise OSError, 'Base is not a directory or does not exist: '+base
+            raise OSError('Base is not a directory or does not exist: '+base)
 
         base_list = (os.path.abspath(base)).split(os.sep)
         target_list = (os.path.abspath(target)).split(os.sep)
 
         # On the windows platform the target may be on a completely different drive from the base.
-        if os.name in ['nt','dos','os2'] and base_list[0] <> target_list[0]:
-            raise OSError, 'Target is on a different drive to base. Target: '+target_list[0].upper()+', base: '+base_list[0].upper()
+        if os.name in ['nt','dos','os2'] and base_list[0] != target_list[0]:
+            raise OSError('Target is on a different drive to base. Target: '+target_list[0].upper()+', base: '+base_list[0].upper())
 
         # Starting from the filepath root, work out how much of the filepath is
         # shared by base and target.
         for i in range(min(len(base_list), len(target_list))):
-            if base_list[i] <> target_list[i]: break
+            if base_list[i] != target_list[i]: break
         else:
             # If we broke out of the loop, i is pointing to the first differing path elements.
             # If we didn't break out of the loop, i is pointing to identical path elements.
@@ -355,7 +356,7 @@ def mark_plot2_labels(app, document):
     the "htmlonly" (or "latexonly") node to the actual figure node
     itself.
     """
-    for name, explicit in document.nametypes.iteritems():
+    for name, explicit in document.nametypes.items():
         if not explicit:
             continue
         labelid = document.nameids[name]
@@ -383,8 +384,8 @@ def setup(app):
     setup.app = app
     setup.config = app.config
     setup.confdir = app.confdir
-
-    app.add_directive('plot2', plot2_directive, True, (0, 1, 0), **options)
+    print("add directive called")
+    app.add_directive('plot2', plot2_directive, True)#, (0, 1, 0))#, **options)
     app.add_config_value(
         'plot2_formats',
         ['png', 'hires.png', 'pdf'],
